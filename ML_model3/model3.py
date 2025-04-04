@@ -45,26 +45,21 @@ def extract_features(url):
         "url_is_shortened": int(any(x in url for x in ["bit.ly", "t.co", "tinyurl.com", "goo.gl", "ow.ly"]))
     }
 
-# === Take multiple URLs from the user ===
 urls = []
-print("Enter URLs (Type 'done' to finish):")
+print("Enter URLs (Please type proper URL )AND(Type 'done' to finish):")
 while True:
     url = input("Enter URL: ").strip()
     if url.lower() == "done":
         break
     urls.append(url)
 
-# Extract features for all URLs
 features_list = [extract_features(url) for url in urls]
 features_df = pd.DataFrame(features_list)
 
-# Scale the features
 features_scaled = scaler.transform(features_df)
 
-# Make predictions
 predictions = model.predict(features_scaled)
 
-# Print results
-print("\n=== URL Classification Results ===")
+print("\n URL Classification Results ")
 for url, result in zip(urls, predictions):
     print(f"{url} → {'Phishing' if result == 1 else 'Legitimate'}")
