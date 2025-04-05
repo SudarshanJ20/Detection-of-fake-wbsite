@@ -6,21 +6,16 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
 
-# 1️⃣ Load Dataset
 df = pd.read_csv(r"C:\Users\sudar\Downloads\Detection-of-fake-wbsite-\ML_model3\synthetic_phishing_dataset.csv")
 
-# 2️⃣ Prepare Features & Labels
-X = df.drop(columns=["URL", "is_phishing"])  # Remove URL & target column
+X = df.drop(columns=["URL", "is_phishing"])
 y = df["is_phishing"]
 
-# 3️⃣ Split Data into Training & Testing Sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 
-# 4️⃣ Train XGBoost Model
 model = xgb.XGBClassifier(eval_metric='logloss')
 model.fit(X_train, y_train)
 
-# 5️⃣ Evaluate Model
 y_pred = model.predict(X_test)
 accuracy = accuracy_score(y_test, y_pred)
 precision = precision_score(y_test, y_pred)
@@ -34,11 +29,9 @@ print(f"Recall: {recall:.4f}")
 print(f"F1 Score: {f1:.4f}")
 print(f"Confusion Matrix:\n{conf_matrix}")
 
-# 6️⃣ Cross-validation Scores
 cv_scores = cross_val_score(model, X, y, cv=5, scoring='accuracy')
 print(f"Cross-validation Accuracy: {cv_scores.mean():.4f}")
 
-# 7️⃣ URL Prediction Function
 def predict_url(url):
     url_length = len(url)
     num_digits = sum(c.isdigit() for c in url)
@@ -50,6 +43,5 @@ def predict_url(url):
     prediction = model.predict(input_features)[0]
     return "Phishing" if prediction == 1 else "Safe"
 
-# Example usage:
 user_url = input("Enter a URL to check: ")
 print(f"Prediction for {user_url}: {predict_url(user_url)}")

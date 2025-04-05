@@ -4,8 +4,6 @@ import random
 import string
 import math
 
-# --- Helper Functions ---
-
 def generate_random_domain(phishing=False):
     brands = ["amazon", "google", "paypal", "microsoft", "apple", "facebook", "netflix"]
     tlds_safe = [".com", ".org", ".net", ".co"]
@@ -96,4 +94,4 @@ for i in random.sample(range(len(data)), int(0.02 * len(data))):
 # Convert and Save
 df = pd.DataFrame(data, columns=columns)
 df.to_csv("phishing_dataset_with_new_features.csv", index=False)
-print("✅ Dataset generated and saved as phishing_dataset_with_new_features.csv")
+print("Dataset generated and saved as phishing_dataset_with_new_features.csv")

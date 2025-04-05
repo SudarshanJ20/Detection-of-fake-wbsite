@@ -2,7 +2,6 @@ import pandas as pd
 from urllib.parse import urlparse
 import difflib
 
-# ✅ Legitimate domains for typo detection
 known_legit_domains = [
     "google.com", "facebook.com", "amazon.com", "apple.com", "microsoft.com",
     "paypal.com", "youtube.com", "instagram.com", "linkedin.com", "twitter.com",
@@ -16,7 +15,6 @@ def is_similar_to_known(domain, known_list, threshold=0.75):
             return True
     return False
 
-# 🔍 Feature extraction logic
 def extract_features(url):
     parsed = urlparse(url)
     domain = parsed.netloc.lower().split(":")[0]
@@ -48,22 +46,18 @@ def extract_features(url):
         "url_is_shortened": int(any(x in url for x in ["bit.ly", "t.co", "tinyurl.com", "goo.gl", "ow.ly"]))
     }
 
-# 🗂️ Load your original dataset
 input_path = r"C:\Users\sudar\Downloads\Detection-of-fake-wbsite-\ML_model3\phishing_dataset_with_new_features.csv"
 df = pd.read_csv(input_path)
 
-# 🛠️ Apply feature extraction row-by-row
 features_list = []
 for url in df["URL"]:
     features = extract_features(url)
     features_list.append(features)
 
-# 🔄 Create new dataset
 df_features = pd.DataFrame(features_list)
 df_features["is_phishing"] = df["is_phishing"]
 
-# 💾 Optional: Save to CSV
 output_path = r"C:\Users\sudar\Downloads\Detection-of-fake-wbsite-\ML_model3\updated_phishing_dataset.csv"
 df_features.to_csv(output_path, index=False)
 
-print("✅ Dataset generated and saved successfully.")
+print("Dataset generated and saved successfully.")

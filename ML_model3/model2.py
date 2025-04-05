@@ -5,29 +5,23 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 
-# === Load your dataset ===
 df = pd.read_csv(r"C:\Users\sudar\Downloads\Detection-of-fake-wbsite-\ML_model3\phishing_website_dataset.csv")
 
-# Drop non-numeric columns
 df_model = df.drop(columns=["URL", "hosting_country"])
 X = df_model.drop(columns=["is_phishing"])
 y = df_model["is_phishing"]
 
-# Fit the scaler
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 X_scaled_df = pd.DataFrame(X_scaled, columns=X.columns)
 
-# Train-test split
 X_train, X_test, y_train, y_test = train_test_split(
     X_scaled_df, y, test_size=0.2, stratify=y, random_state=42
 )
 
-# Train model
 rf_model = RandomForestClassifier(n_estimators=100, random_state=42)
 rf_model.fit(X_train, y_train)
 
-# === Feature extraction ===
 phishing_keywords = ['login', 'verify', 'secure', 'account', 'update']
 risky_tlds = ['.xyz', '.tk', '.ml', '.gq']
 typo_variants = ['g00gle', 'faceb00k', 'amaz0n', 'appl3', 'micros0ft']
@@ -38,7 +32,7 @@ def extract_features_from_url(url):
     path = parsed.path
     full = domain + path
 
-    # Basic URL structure features
+
     num_digits = sum(c.isdigit() for c in url)
     num_special = sum(url.count(c) for c in ['@', '-', '_', '%', '/'])
     subdomain_count = domain.count('.') - 1 if domain else 0
@@ -47,7 +41,6 @@ def extract_features_from_url(url):
     risky_tld = int(any(url.lower().endswith(tld) for tld in risky_tlds))
     typo = int(any(typo in url.lower() for typo in typo_variants))
 
-    # === Smart logic for placeholder values ===
     trusted_domains = [
         "google.com", "paypal.com", "amazon.com", "apple.com",
         "microsoft.com", "facebook.com", "linkedin.com", "dropbox.com",
@@ -77,12 +70,10 @@ def extract_features_from_url(url):
         bounce_rate = 0.5
         avg_time_on_page = 60
 
-    # Placeholder (still static but less important for now)
     has_iframe = 0
     has_mouseover_script = 0
     redirect_count = 0
 
-    # Final feature set
     feature_values = [
         len(url), num_digits, num_special, subdomain_count,
         uses_https, phishing_kw, risky_tld, typo,
@@ -104,11 +95,9 @@ def extract_features_from_url(url):
     return pd.DataFrame([feature_values], columns=feature_names)
 
 
-# === Input & Prediction ===
 user_url = input("Enter a URL to check: ")
 features_df = extract_features_from_url(user_url)
 features_scaled = pd.DataFrame(scaler.transform(features_df), columns=features_df.columns)
 prediction = rf_model.predict(features_scaled)[0]
 
-# === Output ===
 print("\n RESULT:", "Phishing" if prediction == 1 else "Legitimate")

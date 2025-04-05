@@ -13,40 +13,31 @@ from datetime import datetime
 from collections import Counter
 import math
 
-# Load dataset
 df = pd.read_csv(r"C:\Users\sudar\Downloads\Detection-of-fake-wbsite-\ML_model3\phishing_dataset_with_new_features.csv")
 
-# Prepare features and labels
 X = df.drop(columns=["URL", "hosting_country", "is_phishing"])
 y = df["is_phishing"]
 
-# Scale features
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
-# Train-test split
 X_train, X_test, y_train, y_test = train_test_split(
     X_scaled, y, test_size=0.2, random_state=42, stratify=y
 )
 
-# Train model with class weight balanced
 model = RandomForestClassifier(n_estimators=100, random_state=42, class_weight='balanced')
 model.fit(X_train, y_train)
 
-# Helper: Detect IP pattern in URL
 def has_ip(url):
     return int(bool(re.match(r"https?://(\d{1,3}\.){3}\d{1,3}", url)))
 
-# Helper: Check if shortened
 def is_shortened(url):
     return int(any(x in url for x in ["bit.ly", "t.co", "tinyurl.com", "goo.gl", "ow.ly"]))
 
-# Helper: Entropy
 def calculate_entropy(url):
     p = [freq / len(url) for freq in Counter(url).values()]
     return round(-sum(pi * math.log2(pi) for pi in p), 3)
 
-# Helper: DNS check
 def check_dns(domain):
     try:
         dns.resolver.resolve(domain, 'A')
@@ -54,14 +45,12 @@ def check_dns(domain):
     except:
         return 0
 
-# Helper: WHOIS lookup
 def get_whois_info(domain):
     try:
         w = whois.whois(domain)
         created = w.creation_date
         updated = w.updated_date
 
-        # Handle possible list return
         if isinstance(created, list):
             created = created[0]
         if isinstance(updated, list):
@@ -74,13 +63,11 @@ def get_whois_info(domain):
     except:
         return 0, 0
 
-# Improved typo list
 typo_keywords = [
     'g00gle', 'faceb00k', 'amaz0n', 'appl3', 'micros0ft', 'paypa1', 'netf1ix',
     'youtub', 'instagrom', 'linkdin', 'twittter', 'snapchap', 'whatsap'
 ]
 
-# Feature extractor
 def extract_features(url):
     parsed = urlparse(url)
     domain = parsed.netloc.lower().replace("www.", "")
@@ -116,7 +103,6 @@ def extract_features(url):
         "url_is_shortened": is_shortened(url)
     }
 
-# Input URLs
 urls = []
 print("Enter URLs (Type 'done' to finish):")
 while True:
@@ -125,20 +111,16 @@ while True:
         break
     urls.append(url)
 
-# Extract and scale features
 features_list = [extract_features(url) for url in urls]
 features_df = pd.DataFrame(features_list)
 features_scaled = scaler.transform(features_df)
 
-# Make predictions
 predictions = model.predict(features_scaled)
 
-# Display results
 print("\n URL Classification Results ")
 for url, result in zip(urls, predictions):
     print(f"{url} → {'Phishing' if result == 1 else 'Legitimate'}")
 
-# Show feature importance
 feature_names = X.columns
 importances = model.feature_importances_
 indices = np.argsort(importances)[::-1]
