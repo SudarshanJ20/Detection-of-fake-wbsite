@@ -1,6 +1,6 @@
 import pandas as pd
 
-data = "phishing_cleaned.csv"
+data = r"C:\Users\sudar\Downloads\Detection-of-fake-wbsite-\ML_model(final)\phishing_cleaned.csv"
 df = pd.read_csv(data)
 
 print(df.head())
